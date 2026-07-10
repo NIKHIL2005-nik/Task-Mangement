@@ -18,4 +18,8 @@ app.use(express.urlencoded({
 app.use(express.static('public'))
 
 
+// user router and routes
+
+
+
 export {app}
