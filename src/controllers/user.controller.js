@@ -61,10 +61,10 @@ const registerUser = asyncHandler(async (req,res) => {
 
 const loginUser = asyncHandler(async (req,res) => {
 
-    const {email,password} = req.body
+    const {email,password} = req?.body
 
     if(
-        [email,password].some((field) => field.trim() === "")
+        [email,password].some((field) => field.trim() === "") || (!email || !password)
     ){
         throw new ApiError(401,"email and password are required !!")
     }
@@ -87,7 +87,9 @@ const loginUser = asyncHandler(async (req,res) => {
 
     const options = {
         httpOnly : true,
-        secure: true
+        secure: true,
+        sameSite: 'strict',
+        maxAge: Number(process.env.COOKIES_EXPIRY)
     }
 
     return res.status(200)
@@ -98,11 +100,38 @@ const loginUser = asyncHandler(async (req,res) => {
             200,
             {
                 user: loggedInUser,
-                refreshToken,
-                accessToken
             },
             "User login success"
         )
+    )
+})
+
+const logoutUser = asyncHandler(async (req,res) => {
+    await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+           $unset: {
+                refreshToken : ""
+           }
+        },
+        {
+            new : true
+        }
+    )
+
+    const options = {
+        httpOnly : true,
+        secure: true,
+        sameSite: 'strict',
+        maxAge: Number(process.env.COOKIES_EXPIRY)
+    }
+
+    return res
+    .status(200)
+    .clearCookie("refreshToken",options)
+    .clearCookie("accessToken",options)
+    .json(
+        new ApiResponse(200,{},"User logged out successfully")
     )
 })
 
@@ -110,5 +139,6 @@ const loginUser = asyncHandler(async (req,res) => {
 
 export {
     registerUser,
-    loginUser
+    loginUser,
+    logoutUser
 }
