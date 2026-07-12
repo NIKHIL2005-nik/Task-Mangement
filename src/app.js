@@ -20,8 +20,12 @@ app.use(express.static('public'))
 
 // user router and routes
 import userRoutes from '../src/routes/user.routes.js'
-
 app.use('/api/v1/user',userRoutes)
+
+
+// folder routes
+import folderRoutes from '../src/routes/folder.routes.js'
+app.use('/api/v1/folder',folderRoutes)
 
 
 export {app}

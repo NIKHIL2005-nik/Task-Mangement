@@ -2,7 +2,7 @@ import mongoose,{Schema,model} from "mongoose";
 
 
 const folderSchema = new Schema({
-    userid: {
+    user_id: {
         type: Schema.Types.ObjectId,
         ref: "User"
     },
@@ -10,14 +10,16 @@ const folderSchema = new Schema({
         type: String,
         lowercase: true,
         trim: true,
+        required: true
     },
     description: {
         type: String,
         lowercase: true,
-        trim: true
+        trim: true,
+        default: ""
     }
 },{timestamps: true})
 
 
 
-export default Folder = model('Folder',folderSchema)
+export const Folder = model('Folder',folderSchema)

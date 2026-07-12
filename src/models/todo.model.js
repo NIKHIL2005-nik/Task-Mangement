@@ -1,7 +1,7 @@
 import mongoose,{Schema,model} from "mongoose";
 
 const todoSchema = new Schema({
-    userid: {
+    user_id: {
         type: Schema.Types.ObjectId,
         ref: "User"
     },
