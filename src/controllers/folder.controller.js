@@ -9,7 +9,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 const createNewFolder = asyncHandler(async (req,res) => {
     const user_id = req.user?._id    
 
-    const {folder_name,description} = req.body
+    const {folder_name,note} = req.body
 
     if(!folder_name || folder_name.trim() === ""){
         throw new ApiError(401,"folder name is required")
@@ -24,7 +24,7 @@ const createNewFolder = asyncHandler(async (req,res) => {
     }
 
     const folder = await Folder.create({
-        user_id,folder_name,description
+        user_id,folder_name,note
     })
 
     if(!folder){
@@ -40,6 +40,33 @@ const createNewFolder = asyncHandler(async (req,res) => {
     )
 })
 
+const changeFolderNote = asyncHandler(async (req,res) => {
+
+    const {folder_id,note} = req.body
+
+    const folder = await Folder.findById(folder_id)
+
+    if(!folder){
+        throw new ApiError(401,"Folder does not exists !!")
+    }
+
+    folder.note = note
+    folder.save({validateBeforeSave: false})
+
+    return res.status(200)
+    .json(
+        new ApiResponse(200,
+            folder,
+            "folder note changed successfully"
+        )
+    )
+})
+
+const deleteFolder = asyncHandler(async (req,res) => {
+    //later
+})
+
 export {
-    createNewFolder
+    createNewFolder,
+    changeFolderNote
 }

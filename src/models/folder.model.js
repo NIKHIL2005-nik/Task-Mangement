@@ -12,7 +12,7 @@ const folderSchema = new Schema({
         trim: true,
         required: true
     },
-    description: {
+    note: {
         type: String,
         lowercase: true,
         trim: true,

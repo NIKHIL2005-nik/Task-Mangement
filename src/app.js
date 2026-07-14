@@ -28,4 +28,8 @@ import folderRoutes from '../src/routes/folder.routes.js'
 app.use('/api/v1/folder',folderRoutes)
 
 
+// todo routes
+import todoRoutes from '../src/routes/todo.routes.js'
+app.use('/api/v1/todo',todoRoutes)
+
 export {app}
