@@ -51,8 +51,31 @@ const addTodo = asyncHandler(async (req,res) => {
     )
 })
 
+const deleteTodo = asyncHandler(async (req,res) => {
+    const todo_id = req.params?.todo_id
+
+    if(!todo_id){
+        throw new ApiError(401,"todo id is required !!")
+    }
+
+    const deletedTodo = await Todo.findByIdAndDelete(todo_id)
+
+    if(!deletedTodo){
+        throw new ApiError(401,"no such todo exists !!")
+    }
+
+    return res.status(200)
+    .json(
+        new ApiResponse(200,
+            deletedTodo,
+            "todo deleted successfully"
+        )
+    )
+})
+
 
 
 export {
-    addTodo
+    addTodo,
+    deleteTodo
 }
