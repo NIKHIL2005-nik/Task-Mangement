@@ -73,9 +73,74 @@ const deleteTodo = asyncHandler(async (req,res) => {
     )
 })
 
+// change todo info
+const markAsCompleted = asyncHandler(async (req,res) => {
+    const todo_id = req.params?.todo_id
+
+    if(!todo_id){
+        throw new ApiError(401,"todo id is required !!")
+    }
+
+    const todo = await Todo.findByIdAndUpdate(
+        todo_id,
+        {
+            $set: {
+                completed: true
+            }
+        },
+        {
+            new: true
+        }
+    )
+
+    if(!todo){
+        throw new ApiError(401,"invalid todo id !!")
+    }
+
+    return res.status(200)
+    .json(
+        new ApiResponse(200,{},"todo marked as completed successfully")
+    )
+
+})
+
+const changeTodoPriority = asyncHandler(async (req,res) => {
+    const {todo_id,new_priority} = req.body
+
+    if(!todo_id || todo_id?.trim() == ""){
+        throw new ApiError(401,"todo id is required !!")
+    }
+
+    // findByIdAndUpdate does not by default run the field validators in the schema.
+    const todo = await Todo.findByIdAndUpdate(
+        todo_id,
+        {
+            $set: {
+                priority: new_priority
+            }
+        },
+        {
+            new: true,
+            runValidators: true
+        }
+    )
+
+    if(!todo){
+        throw new ApiError(401,"invalid todo id !!")
+    }
+
+    return res.status(200)
+    .json(
+        new ApiResponse(200,{},"priority of todo changed successfully")
+    )
+
+})
+
 
 
 export {
     addTodo,
-    deleteTodo
+    deleteTodo,
+    markAsCompleted,
+    changeTodoPriority
 }
