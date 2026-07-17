@@ -205,7 +205,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     const cookie_refreshToken = req.cookies?.refreshToken    
 
     if (!cookie_refreshToken) {
-        throw new ApiError(100,
+        throw new ApiError(401,
             "invalid refresh token !!"
         )
     }
@@ -215,6 +215,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
         const user = await User.findById(decoded_refreshToken?._id)
 
+        // HTTP status codes below 400 are not considered errors by Express.
         if (!user) {
             throw new ApiError(401,
                 "invalid refresh token !!"

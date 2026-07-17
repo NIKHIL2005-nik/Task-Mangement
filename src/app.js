@@ -18,6 +18,7 @@ app.use(express.urlencoded({
 app.use(express.static('public'))
 
 
+
 // user router and routes
 import userRoutes from '../src/routes/user.routes.js'
 app.use('/api/v1/user',userRoutes)
@@ -31,5 +32,15 @@ app.use('/api/v1/folder',folderRoutes)
 // todo routes
 import todoRoutes from '../src/routes/todo.routes.js'
 app.use('/api/v1/todo',todoRoutes)
+
+app.use((err,req,res,next) => {
+    res.status(err.statuscode || 500).json(
+        {
+            statusCode: err.statuscode || 500,
+            message: err.message || "something went wrong !!",
+            success: err.success || false
+        }
+    )
+})
 
 export {app}
