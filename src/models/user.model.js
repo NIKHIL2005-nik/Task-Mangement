@@ -19,12 +19,6 @@ const userSchema = new Schema({
         type: String,
         required: [true, "password is required"]
     },
-    todo_history: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "Todo"
-        }
-    ],
     refreshToken: {
         type: String,
     }

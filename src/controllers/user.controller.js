@@ -5,6 +5,8 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
+import { Folder } from "../models/folder.model.js";
+import { Todo } from "../models/todo.model.js";
 
 const generateAccessAndRefreshToken = async (user_id) => {
     const user = await User.findById(user_id)
@@ -135,6 +137,72 @@ const logoutUser = asyncHandler(async (req,res) => {
     )
 })
 
+const changePassword = asyncHandler(async (req,res) => {
+    
+    const user_id = req.user?._id
+
+    const {old_password,new_password} = req.body
+
+    const user = await User.findById(user_id)
+
+    if(
+        [old_password,new_password].some((field) => field.trim() === "")
+    ){
+        throw new ApiError(401,"both old and new passwords are required !!")
+    }
+
+    const isPasswordCorrect = await user.isPasswordCorrect(old_password)
+
+    if(!isPasswordCorrect){
+        throw new ApiError(402,"invalid old password !!")
+    }
+
+    user.password = new_password
+    await user.save({validateBeforeSave: false})
+
+    return res.status(200)
+    .json(
+        new ApiResponse(200,
+            {},
+            "user password changed successfully"
+        )
+    )
+})
+
+const getUserProfile = asyncHandler(async (req,res) => {
+    // NOTE: mongoose do not let the fields not in the schema to be added to any of it's instance so we need to create the another object here to send the response.
+    const user_data = req.user
+    const response = {
+        username: user_data.username,
+        email: user_data.email,
+        createdAt: user_data.createdAt,
+        updatedAt: user_data.updatedAt
+    }
+
+    const folders_count = await Folder.countDocuments({user_id : user_data?._id})
+    const todos_count = await Todo.countDocuments({user_id : user_data?._id})
+    const pendingTodos_count = await Todo.countDocuments({
+        $and: [{user_id : user_data?._id},{completed: false}]
+    })
+    
+    response.folders_count = folders_count
+    response.todos = {
+        total: todos_count,
+        pending: pendingTodos_count,
+        completed: todos_count-pendingTodos_count
+    }
+    
+    return res.status(200)
+    .json(
+        new ApiResponse(200,
+            response,
+            "user profile fetched successfully"
+        )
+    )
+})
+
+
+
 
 
 
@@ -142,5 +210,7 @@ const logoutUser = asyncHandler(async (req,res) => {
 export {
     registerUser,
     loginUser,
-    logoutUser
+    logoutUser,
+    changePassword,
+    getUserProfile,
 }
