@@ -35,7 +35,7 @@ app.use('/api/v1/todo',todoRoutes)
 
 // this is the error class which should be at the last of all the routes and whenever any error is raised and not manually catched either through the custom error class or the default Error class the error instance is passes in this middleware and response is send instead of default HTML page.
 app.use((err,req,res,next) => {
-    res.status(err.statuscode || 500).json(
+    res.json(
         {
             statusCode: err.statuscode || 500,
             message: err.message || "something went wrong !!",

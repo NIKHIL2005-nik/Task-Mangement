@@ -24,6 +24,13 @@ const generateAccessAndRefreshToken = async (user_id) => {
     return { accessToken, refreshToken }
 }
 
+const getCookieOptions = () => ({
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+    maxAge: Number(process.env.COOKIES_EXPIRY)
+})
+
 const registerUser = asyncHandler(async (req, res) => {
     const { username, email, password } = req.body
 
@@ -87,12 +94,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
     const loggedInUser = await User.findById(existingUser._id).select("-password -refreshToken")
 
-    const options = {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
-        maxAge: Number(process.env.COOKIES_EXPIRY)
-    }
+    const options = getCookieOptions()
 
     return res.status(200)
         .cookie("refreshToken", refreshToken, options)
@@ -121,12 +123,7 @@ const logoutUser = asyncHandler(async (req, res) => {
         }
     )
 
-    const options = {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
-        maxAge: Number(process.env.COOKIES_EXPIRY)
-    }
+    const options = getCookieOptions()
 
     return res
         .status(200)
@@ -226,12 +223,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             throw new ApiError(401, "invalid refresh token !!")
         }
 
-        const options = {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'strict',
-            maxAge: Number(process.env.COOKIES_EXPIRY)
-        }
+        const options = getCookieOptions()
 
         const { refreshToken, accessToken } = await generateAccessAndRefreshToken(user?._id)
 
